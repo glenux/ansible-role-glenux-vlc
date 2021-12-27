@@ -1,0 +1,6 @@
+---
+# defaults file for glenux.vlc
+glenux_vlc_users: []
+
+glenux_vlc_live555_rtp_client_port: "-666"
+glenux_vlc_rtp_rtcp_port: "-666"

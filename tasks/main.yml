@@ -1,0 +1,69 @@
+---
+# Setup RTP/RTSP port for Freebox TV
+- name: Set live555.rtp-client-port
+  ini_file:
+    path: "/home/{{item}}/.config/vlc/vlcrc"
+    section: live555
+    option: rtp-client-port
+    value: "{{ glenux_vlc_live555_rtp_client_port }}"
+    mode: 0600
+    backup: "yes"
+  with_items: "{{ glenux_vlc_users }}"
+
+- name: Set live555.rtsp-tcp=1
+  ini_file:
+    path: "/home/{{item}}/.config/vlc/vlcrc"
+    section: live555
+    option: rtsp-tcp
+    value: "1"
+    mode: 0600
+    backup: "yes"
+  with_items: "{{ glenux_vlc_users }}"
+
+- name: Set rtp.rtcp-port
+  ini_file:
+    path: "/home/{{item}}/.config/vlc/vlcrc"
+    section: rtp
+    option: rtcp-port
+    value: "{{ glenux_vlc_rtp_rtcp_port }}"
+    mode: 0600
+    backup: "yes"
+  with_items: "{{ glenux_vlc_users }}"
+
+- name: Set rtp.dynamic-pt=theora
+  ini_file:
+    path: "/home/{{item}}/.config/vlc/vlcrc"
+    section: rtp
+    option: dynamic-pt
+    value: theora
+    mode: 0600
+    backup: "yes"
+  with_items: "{{ glenux_vlc_users }}"
+
+- name: "Fix INI file for VLC (which does not accept spaces around '=')"
+  command: sed -i -e 's/ = /=/g' "/home/{{item}}/.config/vlc/vlc-qt-interface.conf"
+  with_items: "{{ glenux_vlc_users }}"
+
+- name: "Fix INI file for VLC (which does not accept spaces around '=')"
+  command: sed -i -e 's/ = /=/g' "/home/{{item}}/.config/vlc/vlcrc"
+  with_items: "{{ glenux_vlc_users }}"
+
+- name: Create a Vidéos directory if it does not exist
+  file:
+    path: "/home/{{item}}/Vidéos"
+    state: directory
+    mode: '0755'
+    owner: "{{ item }}"
+    group: "{{ item }}"
+  with_items: "{{ glenux_vlc_users }}"
+
+# Setup Freebox TV playlist
+- name: Get freeboxTV playlist
+  get_url:
+    url: http://mafreebox.freebox.fr/freeboxtv/playlist.m3u
+    dest: "/home/{{item}}/Vidéos/freebox-tv.m3u"
+    mode: '0666'
+    owner: "{{ item }}"
+    group: "{{ item }}"
+  with_items: "{{ glenux_vlc_users }}"
+#
